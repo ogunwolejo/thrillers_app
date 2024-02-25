@@ -19,7 +19,7 @@ export const createUserCreditAccount = async(userId:string):Promise<CreditAccoun
   }
 }
 
-const findAccount = async(userId:string):Promise<CreditAccount | Error> => {
+export const findAccount = async(userId:string):Promise<CreditAccount | Error> => {
   try {
     const account:CreditAccount | null = await prisma.creditAccount.findFirst({
       where:{
@@ -37,17 +37,20 @@ const findAccount = async(userId:string):Promise<CreditAccount | Error> => {
   }
 }
 
-export const updateUserCreditBalance = async(userId:string, newAmount:string) => {
+export const updateUserCreditBalance = async(accountId:string, /*userId:string,*/ newAmount:number):Promise<CreditAccount | Error> => {
   try {
-    const updateAccont = await prisma.creditAccount.update({
+    const updateAccont:CreditAccount = await prisma.creditAccount.update({
       where:{
-        userId
+        id:accountId,
+        //userId:userId
       },
       data:{
         amount:newAmount,
       },
     })
+    return updateAccont;
   } catch (e) {
+    console.log('###', e)
     return (e as Error);
   }
 }

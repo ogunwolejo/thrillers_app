@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { withAccelerate } from '@prisma/extension-accelerate'
 import {LogUser, NewUser} from '../types';
 import {User, PrismaClient} from '@prisma/client';
@@ -23,7 +24,6 @@ export const createUser = async(user:NewUser):Promise<User | Error> => {
     }
     return newUser;
   } catch (e) {
-    console.log(e);
     return (e as Error);
   }
 }
@@ -46,9 +46,23 @@ export const getUser = async(user:LogUser) => {
 
     const token = generateToken(findUser.id.toString());
     return {
-      ...findUser,
+      ..._.omit(findUser, 'password'),
       token
     }
+  } catch (e) {
+    return (e as Error);
+  }
+}
+
+export const getAllUser = async() => {
+  try {
+    const findAllUser:User[] = await prisma.user.findMany();
+    if(findAllUser.length == 0) {
+      throw new Error('User credential not found!');
+    }
+
+    const formattedData = _.map(findAllUser, obj => _.omit(obj, 'password'))
+    return formattedData;
   } catch (e) {
     return (e as Error);
   }

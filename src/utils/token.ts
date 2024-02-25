@@ -1,11 +1,17 @@
-import {sign} from 'jsonwebtoken';
+import {JwtPayload, sign, verify} from 'jsonwebtoken';
 
-export const generateToken = (payload:string) => {
-  console.log("payload", payload);
-  const secret:string = process.env.SECRET ?? 'Mm12345';
-  const token:string = sign(payload.toString(), secret, {
-    expiresIn:'2 days'
+export const generateToken = (payload:string):string => {
+  const secret:string = process.env.SECRET!;
+  const token:string = sign({id:payload}, secret, {
+    algorithm:'HS256',
+    expiresIn:3600 * 24 * 2
   })
-  console.log('@@', token);
   return token;
+}
+
+export const verifyToken = (token:string):JwtPayload | string => {
+  const secret:string = process.env.SECRET!;
+  return verify(token, secret, {
+    ignoreExpiration:false,
+  })
 }
